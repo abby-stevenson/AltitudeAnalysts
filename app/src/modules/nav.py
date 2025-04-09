@@ -7,53 +7,83 @@ import streamlit as st
 
 #### ------------------------ General ------------------------
 def HomeNav():
-    st.sidebar.page_link("Home.py", label="Home", icon="🏠")
+    st.sidebar.page_link("Home.py", label="Home")
+    ##icon="🏠"
 
 
 def AboutPageNav():
-    st.sidebar.page_link("pages/30_About.py", label="About", icon="🧠")
+    st.sidebar.page_link("pages/40_About.py", label="About")
+    ##icon="🧠"
 
 
-#### ------------------------ Examples for Role of pol_strat_advisor ------------------------
-def PolStratAdvHomeNav():
+#### ------------------------ Travel Agent Role ------------------------
+def TravelAgentHome():
     st.sidebar.page_link(
-        "pages/00_Pol_Strat_Home.py", label="Political Strategist Home", icon="👤"
-    )
+        "pages/00_Travel_Agent_Home.py", label="Travel Agent Home")
+    ##icon="👤"
 
 
-def WorldBankVizNav():
+def SearchForFlights():
     st.sidebar.page_link(
-        "pages/01_World_Bank_Viz.py", label="World Bank Visualization", icon="🏦"
-    )
+        "pages/01_Travel_Agent_Search_Flights.py", label="Search for Flights")
+    ##icon="🏦"
 
 
-def MapDemoNav():
-    st.sidebar.page_link("pages/02_Map_Demo.py", label="Map Demonstration", icon="🗺️")
+def SeatMap():
+    st.sidebar.page_link("pages/02_Seat_Map.py", label="View Seat Map Current Availability and Price")
+    ##icon="🗺️"
+
+def AddPassenger():
+    st.sidebar.page_link("pages/03_Add_Passenger.py", label="Add Passenger")
+
+def CustomerFlights():
+    st.sidebar.page_link("pages/04_Customer_Flights.py", label="View Flights Customers Have Been Booked Onto")
 
 
-## ------------------------ Examples for Role of usaid_worker ------------------------
-def ApiTestNav():
-    st.sidebar.page_link("pages/12_API_Test.py", label="Test the API", icon="🛜")
 
-
-def PredictionNav():
+## ------------------------ Airline Manager Role ------------------------
+def AirlineManagerHome():
     st.sidebar.page_link(
-        "pages/11_Prediction.py", label="Regression Prediction", icon="📈"
-    )
+        "pages/10_Airline_Manager.py", label="Airline Manager Home")
+
+def FlightStats():
+    st.sidebar.page_link("pages/11_Flight_Stats.py", label="Your Airlines Flight Statistics")
 
 
-def ClassificationNav():
-    st.sidebar.page_link(
-        "pages/13_Classification.py", label="Classification Demo", icon="🌺"
-    )
+def AddFlights():
+    st.sidebar.page_link("pages/12_Add_Flights.py", label="Add Flights")
 
 
-#### ------------------------ System Admin Role ------------------------
-def AdminPageNav():
-    st.sidebar.page_link("pages/20_Admin_Home.py", label="System Admin", icon="🖥️")
-    st.sidebar.page_link(
-        "pages/21_ML_Model_Mgmt.py", label="ML Model Management", icon="🏢"
-    )
+def RemoveFlights():
+    st.sidebar.page_link("pages/13_Remove_Flights.py", label="Remove Flights")
+
+
+#### ------------------------ Passenger Role ------------------------
+def PassengerHome():
+    st.sidebar.page_link("pages/20_Passenger_Home.py", label="Passenger Home")
+
+def FlightStatus():
+    st.sidebar.page_link("pages/21_Flight_Status.py", label="See the Status of Your Flight")
+    
+def BoardingPass():
+    st.sidebar.page_link("pages/22_Boarding_Pass.py", label="Download and Print your Boarding Pass")
+
+def BookedFlights():
+    st.sidebar.page_link("pages/23_Booked_Flights.py", label="See All Your Booked Flights")
+
+
+#### ------------------------ Airport Manager Role ------------------------
+def AirportManagerHome():
+    st.sidebar.page_link("pages/30_Airport_Manager.py", label="Airport Manager Home")
+
+def FlightStatsTerminal():
+    st.sidebar.page_link("pages/31_Flight_Stats_Terminal.py", label="See All The Flights Departing From A Specific Terminal")
+    
+def Businesses():
+    st.sidebar.page_link("pages/32_Businesses.py", label="See Businesses Operating in Your Airport")
+
+def MonitorFlights():
+    st.sidebar.page_link("pages/33_Monitor_Flights.py", label="Monitor and Update Flight Information")
 
 
 # --------------------------------Links Function -----------------------------------------------
@@ -78,20 +108,33 @@ def SideBarLinks(show_home=False):
     if st.session_state["authenticated"]:
 
         # Show World Bank Link and Map Demo Link if the user is a political strategy advisor role.
-        if st.session_state["role"] == "pol_strat_advisor":
-            PolStratAdvHomeNav()
-            WorldBankVizNav()
-            MapDemoNav()
+        if st.session_state["role"] == "Travel_Agent":
+            TravelAgentHome()
+            SearchForFlights()
+            SeatMap()
+            AddPassenger()
+            CustomerFlights()
 
         # If the user role is usaid worker, show the Api Testing page
-        if st.session_state["role"] == "usaid_worker":
-            PredictionNav()
-            ApiTestNav()
-            ClassificationNav()
+        if st.session_state["role"] == "Airline_Manager":
+            AirlineManagerHome()
+            FlightStats()
+            AddFlights()
+            RemoveFlights()
 
         # If the user is an administrator, give them access to the administrator pages
-        if st.session_state["role"] == "administrator":
-            AdminPageNav()
+        if st.session_state["role"] == "Passenger":
+            PassengerHome()
+            FlightStatus()
+            BoardingPass()
+            BookedFlights()
+
+        if st.session_state["role"] == "Airport_Manager":
+            AirportManagerHome()
+            FlightStatsTerminal()
+            Businesses()
+            MonitorFlights()
+
 
     # Always show the About page at the bottom of the list of links
     AboutPageNav()

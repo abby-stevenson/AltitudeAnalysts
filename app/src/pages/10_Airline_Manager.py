@@ -9,22 +9,22 @@ st.set_page_config(layout = 'wide')
 # Show appropriate sidebar links for the role of the currently logged in user
 SideBarLinks()
 
-st.title(f"Welcome USAID Worker, {st.session_state['first_name']}.")
+st.title(f"Welcome Airline Manager, {st.session_state['first_name']}.")
 st.write('')
 st.write('')
 st.write('### What would you like to do today?')
 
-if st.button('Predict Value Based on Regression Model', 
-             type='primary',
+if st.button('Your Airlines Flight Statistics', 
+             type='secondary',
              use_container_width=True):
-  st.switch_page('pages/11_Prediction.py')
+  st.switch_page('pages/11_Flight_Stats.py')
 
-if st.button('View the Simple API Demo', 
-             type='primary',
+if st.button('Add Flights', 
+             type='secondary',
              use_container_width=True):
-  st.switch_page('pages/12_API_Test.py')
+  st.switch_page('pages/12_Add_Flights.py')
 
-if st.button("View Classification Demo",
-             type='primary',
+if st.button("Remove Flights",
+             type='secondary',
              use_container_width=True):
-  st.switch_page('pages/13_Classification.py')
+  st.switch_page('pages/13_Remove_Flights.py')
