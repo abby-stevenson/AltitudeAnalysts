@@ -100,8 +100,9 @@ def SideBarLinks(show_home=False):
         st.session_state.authenticated = False
         st.switch_page("Home.py")
 
-    if show_home:
+    if show_home or not (st.session_state["authenticated"]):
         # Show the Home page link (the landing page)
+        #Shows the home button if about is clicked striaght from the home page 
         HomeNav()
 
     # Show the other page navigators depending on the users' role.
@@ -145,3 +146,5 @@ def SideBarLinks(show_home=False):
             del st.session_state["role"]
             del st.session_state["authenticated"]
             st.switch_page("Home.py")
+
+    
