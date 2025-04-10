@@ -1,6 +1,5 @@
 ########################################################
-# Sample customers blueprint of endpoints
-# Remove this file if you are not using it in your project
+# flight_stats blueprint
 ########################################################
 from flask import Blueprint
 from flask import request
@@ -13,71 +12,104 @@ from backend.ml_models.model01 import predict
 #------------------------------------------------------------
 # Create a new Blueprint object, which is a collection of 
 # routes.
-customers = Blueprint('customers', __name__)
+customers = Blueprint('flight stats', __name__)
 
 
 #------------------------------------------------------------
-# Get all customers from the system
-@customers.route('/customers', methods=['GET'])
-def get_customers():
+# Returns the percentage of flights 
+# that departed on time on that day [Bob-1]
 
+@customers.route('/flights/<date>', methods=['GET'])
+def get_flights(date):
+    current_app.logger.info('GET /flights/<date> route')
     cursor = db.get_db().cursor()
-    cursor.execute('''SELECT id, company, last_name,
-                    first_name, job_title, business_phone FROM customers
-    ''')
+    cursor.execute('SELECT f.DepartureDate, (SUM(s.OnTime) / COUNT(*) * 100) AS OnTimePercentage ' \
+                        'FROM Flight f JOIN Status s ' \
+                        'ON f.Status = s.Id ' \
+                        'WHERE AirlineId = 1 ' \
+                        'GROUP BY f.DepartureDate ' \
+                        'ORDER BY f. DepartureDate;')
     
     theData = cursor.fetchall()
-    
     the_response = make_response(jsonify(theData))
     the_response.status_code = 200
     return the_response
 
-#------------------------------------------------------------
-# Update customer info for customer with particular userID
-#   Notice the manner of constructing the query.
-@customers.route('/customers', methods=['PUT'])
-def update_customer():
-    current_app.logger.info('PUT /customers route')
-    cust_info = request.json
-    cust_id = cust_info['id']
-    first = cust_info['first_name']
-    last = cust_info['last_name']
-    company = cust_info['company']
-
-    query = 'UPDATE customers SET first_name = %s, last_name = %s, company = %s where id = %s'
-    data = (first, last, company, cust_id)
-    cursor = db.get_db().cursor()
-    r = cursor.execute(query, data)
-    db.get_db().commit()
-    return 'customer updated!'
 
 #------------------------------------------------------------
-# Get customer detail for customer with particular userID
-#   Notice the manner of constructing the query. 
-@customers.route('/customers/<userID>', methods=['GET'])
-def get_customer(userID):
-    current_app.logger.info('GET /customers/<userID> route')
+# Returns the average on-time rate of the given airline [Bob-2]
+
+@customers.route('/flights/<airlineID>/onTimeRate', methods=['GET'])
+def get_on_time_rate(airlineID):
+    current_app.logger.info('GET /flights/<airlineID>/onTimeRate route')
     cursor = db.get_db().cursor()
-    cursor.execute('SELECT id, first_name, last_name FROM customers WHERE id = {0}'.format(userID))
-    
+    cursor.execute('SELECT f.AirlineId, a.Name AS AirlineName, '
+                        '(SUM(s.OnTime) / COUNT(s.OnTime) * 100) AS OnTimePercentage ' \
+                        'FROM Flight f JOIN Status s ON f.Status = s.Id ' \
+                        'JOIN Airline a ON f.AirlineId = a.Id' \
+                        'GROUP BY f.AirlineId, a.Name ORDER BY OnTimePercentage DESC;')
+
     theData = cursor.fetchall()
-    
     the_response = make_response(jsonify(theData))
     the_response.status_code = 200
     return the_response
 
+
 #------------------------------------------------------------
-# Makes use of the very simple ML model in to predict a value
-# and returns it to the user
-@customers.route('/prediction/<var01>/<var02>', methods=['GET'])
-def predict_value(var01, var02):
-    current_app.logger.info(f'var01 = {var01}')
-    current_app.logger.info(f'var02 = {var02}')
+# Returns the average occupancy rate for all flights for a given airline [Bob-3]
 
-    returnVal = predict(var01, var02)
-    return_dict = {'result': returnVal}
-
-    the_response = make_response(jsonify(return_dict))
+@customers.route('/flights/<airlineID>/occupancyRate', methods=['GET'])
+def get_avg_occupancy(airlineID):
+    current_app.logger.info('GET /flights/<airlineID>/occupancyRate route')
+    cursor = db.get_db().cursor()
+    cursor.execute('SELECT f.DepartureDate, '
+                        '(COUNT(b.PassengerId) / f.Occupancy * 100) AS OccupancyPercentage ' \
+                        'FROM Flight f LEFT JOIN Booked b ON f.FlightNumber = b.FlightNumber ' \
+                        'GROUP BY f.DepartureDate, f.Occupancy ' \
+                        'ORDER BY f.DepartureDate DESC;')
+    
+    theData = cursor.fetchall()
+    the_response = make_response(jsonify(theData))
     the_response.status_code = 200
-    the_response.mimetype = 'application/json'
+    return the_response
+
+
+#------------------------------------------------------------
+# Returns common reasons for flight delays [Bob-4]
+
+@customers.route('/flights/<airlineID>', methods=['GET'])
+def reasons_flight_delays(airlineID):
+    current_app.logger.info('GET /flights/<airlineID> route')
+    cursor = db.get_db().cursor()
+    cursor.execute('SELECT SUM(s.DelayedCascading) AS DelayedCascading, ' \
+                        'SUM(s.DelayedTechnicalIssues) AS DelayedTechnicalIssues, ' \
+                        'SUM(s.DelayedAdminIssues) AS DelayedAdminIssues, ' \
+                        'SUM(s.DelayedOther) AS DelayedOther, ' \
+                        'SUM(s.DelayedWeather) AS DelayedWeather, ' \
+                        'SUM(s.DelayedOperational) AS DelayedOperational ' \
+                        'FROM Flight f ' \
+                        'JOIN Status s ON f.Status = s.Id ' \
+                        'WHERE  f.AirlineId = 1;')
+    
+    theData = cursor.fetchall()
+    the_response = make_response(jsonify(theData))
+    the_response.status_code = 200
+    return the_response
+
+
+#------------------------------------------------------------
+# Returns the most and least popular times for flights [Bob-5]
+
+@customers.route('/flights', methods=['GET'])
+def get_flight_times():
+    current_app.logger.info('GET /flights route')
+    cursor = db.get_db().cursor()
+    cursor.execute('SELECT DepartureDate, COUNT(*) AS FlightCount ' \
+                        'FROM Flight ' \
+                        'GROUP BY DepartureDate ' \
+                        'ORDER BY FlightCount DESC;')
+    
+    theData = cursor.fetchall()
+    the_response = make_response(jsonify(theData))
+    the_response.status_code = 200
     return the_response
