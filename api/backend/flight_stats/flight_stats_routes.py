@@ -1,5 +1,5 @@
 ########################################################
-# flight_stats blueprint
+# Flight Stats blueprint
 ########################################################
 from flask import Blueprint
 from flask import request
@@ -12,23 +12,19 @@ from backend.ml_models.model01 import predict
 #------------------------------------------------------------
 # Create a new Blueprint object, which is a collection of 
 # routes.
-customers = Blueprint('flight stats', __name__)
+flight_stats = Blueprint('flight stats', __name__)
 
 
 #------------------------------------------------------------
 # Returns the percentage of flights 
 # that departed on time on that day [Bob-1]
+# works
 
-@customers.route('/flights/<date>', methods=['GET'])
+@flight_stats.route('/flights/<date>', methods=['GET'])
 def get_flights(date):
     current_app.logger.info('GET /flights/<date> route')
     cursor = db.get_db().cursor()
-    cursor.execute('SELECT f.DepartureDate, (SUM(s.OnTime) / COUNT(*) * 100) AS OnTimePercentage ' \
-                        'FROM Flight f JOIN Status s ' \
-                        'ON f.Status = s.Id ' \
-                        'WHERE AirlineId = 1 ' \
-                        'GROUP BY f.DepartureDate ' \
-                        'ORDER BY f. DepartureDate;')
+    cursor.execute('SELECT f.DepartureDate, (SUM(s.OnTime) / COUNT(*) * 100) AS OnTimePercentage FROM Flight f JOIN Status s ON f.Status = s.Id WHERE AirlineId = 1 GROUP BY f.DepartureDate ORDER BY f. DepartureDate;') 
     
     theData = cursor.fetchall()
     the_response = make_response(jsonify(theData))
@@ -38,16 +34,13 @@ def get_flights(date):
 
 #------------------------------------------------------------
 # Returns the average on-time rate of the given airline [Bob-2]
+# works
 
-@customers.route('/flights/<airlineID>/onTimeRate', methods=['GET'])
+@flight_stats.route('/flights/<airlineID>/onTimeRate', methods=['GET'])
 def get_on_time_rate(airlineID):
     current_app.logger.info('GET /flights/<airlineID>/onTimeRate route')
     cursor = db.get_db().cursor()
-    cursor.execute('SELECT f.AirlineId, a.Name AS AirlineName, '
-                        '(SUM(s.OnTime) / COUNT(s.OnTime) * 100) AS OnTimePercentage ' \
-                        'FROM Flight f JOIN Status s ON f.Status = s.Id ' \
-                        'JOIN Airline a ON f.AirlineId = a.Id' \
-                        'GROUP BY f.AirlineId, a.Name ORDER BY OnTimePercentage DESC;')
+    cursor.execute('SELECT f.AirlineId, a.Name AS AirlineName, (SUM(s.OnTime) / COUNT(s.OnTime) * 100) AS OnTimePercentage FROM Flight f JOIN Status s ON f.Status = s.Id JOIN Airline a ON f.AirlineId = a.Id GROUP BY f.AirlineId, a.Name ORDER BY OnTimePercentage DESC;')
 
     theData = cursor.fetchall()
     the_response = make_response(jsonify(theData))
@@ -57,8 +50,9 @@ def get_on_time_rate(airlineID):
 
 #------------------------------------------------------------
 # Returns the average occupancy rate for all flights for a given airline [Bob-3]
+# works
 
-@customers.route('/flights/<airlineID>/occupancyRate', methods=['GET'])
+@flight_stats.route('/flights/<airlineID>/occupancyRate', methods=['GET'])
 def get_avg_occupancy(airlineID):
     current_app.logger.info('GET /flights/<airlineID>/occupancyRate route')
     cursor = db.get_db().cursor()
@@ -76,8 +70,9 @@ def get_avg_occupancy(airlineID):
 
 #------------------------------------------------------------
 # Returns common reasons for flight delays [Bob-4]
+# IndexError: Replacement index 1 out of range for positional args tuple
 
-@customers.route('/flights/<airlineID>', methods=['GET'])
+@flight_stats.route('/flights/<airlineID>', methods=['GET'])
 def reasons_flight_delays(airlineID):
     current_app.logger.info('GET /flights/<airlineID> route')
     cursor = db.get_db().cursor()
@@ -89,7 +84,7 @@ def reasons_flight_delays(airlineID):
                         'SUM(s.DelayedOperational) AS DelayedOperational ' \
                         'FROM Flight f ' \
                         'JOIN Status s ON f.Status = s.Id ' \
-                        'WHERE  f.AirlineId = 1;')
+                        'WHERE  f.AirlineId = 1;') 
     
     theData = cursor.fetchall()
     the_response = make_response(jsonify(theData))
@@ -99,8 +94,9 @@ def reasons_flight_delays(airlineID):
 
 #------------------------------------------------------------
 # Returns the most and least popular times for flights [Bob-5]
+# works
 
-@customers.route('/flights', methods=['GET'])
+@flight_stats.route('/flights', methods=['GET'])
 def get_flight_times():
     current_app.logger.info('GET /flights route')
     cursor = db.get_db().cursor()
@@ -113,3 +109,4 @@ def get_flight_times():
     the_response = make_response(jsonify(theData))
     the_response.status_code = 200
     return the_response
+
