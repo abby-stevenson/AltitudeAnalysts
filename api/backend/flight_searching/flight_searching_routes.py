@@ -7,12 +7,10 @@ from backend.db_connection import db
 from backend.ml_models.model01 import predict
 import datetime
 
-
 #------------------------------------------------------------
 # Create a new Blueprint object, which is a collection of 
 # routes.
 flight_searching = Blueprint('flight_searching', __name__)
-
 
 #------------------------------------------------------------
 # Returns all flights between these two dates [Stacy-1] -- COMPLETE WITHOUT DATES 
@@ -58,10 +56,6 @@ def get_flightdates(Date1 ,Date2):
     the_response.status_code = 200
     return the_response
 
-
-
-
-
 #------------------------------------------------------------
 # Returns all the flights with their prices for a specific airline [Stacy-3] COMPLETE
 @flight_searching.route('/flight_searching/<Id>', methods=['GET']) 
@@ -79,7 +73,6 @@ WHERE a.Id = {0};
     the_response = make_response(jsonify(theData))
     the_response.status_code = 200
     return the_response
-
 
 #------------------------------------------------------------
 # Returns seat location and price information for the given flight [Stacy-5] COMPLETE
@@ -99,8 +92,6 @@ WHERE f.FlightNumber = {0};
     the_response = make_response(jsonify(theData))
     the_response.status_code = 200
     return the_response
-
-
 
 #------------------------------------------------------------ 
 # Returns all the flights leaving from the given airport [Liam-5] -COMPLETE
@@ -145,13 +136,10 @@ def get_flightlocationAirport(DepartureAirportCode):
     the_response.status_code = 200
     return the_response
 
-
- 
-
 #------------------------------------------------------------
 # Returns all flights leaving from a given terminal at a given airport [Liam-7]
 
-@flight_searching.route('/flight_searching/<DepartureAirportCode>/<Terminal>', methods=['GET'])
+@flight_searching.route('/terminal/<DepartureAirportCode>/<Terminal>', methods=['GET'])
 def get_flightlocation(DepartureAirportCode, Terminal): 
     cursor = db.get_db().cursor()
 
