@@ -106,6 +106,9 @@ def add_flight():
 
     flight_data = request.get_json()
 
+    current_app.logger.info(flight_data.get('flight_id'))
+    #current_app.logger("Here")
+
     query = '''
         INSERT INTO Flight (
             FlightNumber, ArrivalTime, DepartureTime, 
@@ -138,4 +141,3 @@ def add_flight():
     r = cursor.execute(query, data)
     db.get_db().commit()
     return 'Flight Added!'
-
