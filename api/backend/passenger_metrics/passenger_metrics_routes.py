@@ -20,7 +20,10 @@ def passenger_flights_info(passenger_id):
 
 
     cursor = db.get_db().cursor()
-    cursor.execute("""SELECT f.FlightNumber, f.DepartureDate, f.ArrivalAirportCode, f.DepartureAirportCode FROM Flight f JOIN Booked b ON f.FlightNumber = b.FlightNumber JOIN Passenger p ON b.PassengerId = p.Id WHERE p.Id = {0}""".format(passenger_id))
+    cursor.execute("""SELECT f.FlightNumber, f.DepartureDate, f.ArrivalAirportCode, 
+                   f.DepartureAirportCode 
+                   FROM Flight f JOIN Booked b ON f.FlightNumber = b.FlightNumber 
+                   JOIN Passenger p ON b.PassengerId = p.Id WHERE p.Id = {0}""".format(passenger_id))
     
     data = cursor.fetchall()
     
@@ -35,7 +38,8 @@ def passenger_flights_info(passenger_id):
 def passenger_flight_changes(travel_agent_id):
     
     cursor = db.get_db().cursor()
-    cursor.execute("""SELECT s.Cancelled, s.OnTime, s.DelayedCascading, s.DelayedTechnicalIssues, s.DelayedAdminIssues, s.DelayedOther, s.DelayedWeather, s.DelayedOperational
+    cursor.execute("""SELECT s.Cancelled, s.OnTime, s.DelayedCascading, s.DelayedTechnicalIssues, 
+                   s.DelayedAdminIssues, s.DelayedOther, s.DelayedWeather, s.DelayedOperational
                     FROM Status s
                         JOIN Flight f ON s.id = f.Status
                         JOIN Booked b ON b.FlightNumber = f.FlightNumber
@@ -71,7 +75,8 @@ def passenger_flights(passenger_id):
 @passenger_metrics.route('/flight_statuses/<passenger_id>', methods=['GET'])
 def passenger_flights_status(passenger_id):
     cursor = db.get_db().cursor()
-    cursor.execute("""SELECT f.FlightNumber, s.Cancelled, s.OnTime, s.DelayedCascading, s.DelayedTechnicalIssues, s.DelayedAdminIssues,
+    cursor.execute("""SELECT f.FlightNumber, s.Cancelled, s.OnTime, s.DelayedCascading, 
+                   s.DelayedTechnicalIssues, s.DelayedAdminIssues,
                     s.DelayedOther, s.DelayedWeather, s.DelayedOperational
                         FROM Status s
                             JOIN Flight f ON f.Status = s.Id
@@ -103,39 +108,41 @@ def passenger_boarding_pass(passenger_id, flight_id):
     return response
 
 #------------------------------------------------------------
-# need to add given agent id!
 # Adds a new passenger to the system with the given passengerID 
 # under the given agentID
 @passenger_metrics.route('/add_passenger/<agentID>/passenger', methods=['POST'])
-def add_passenger():
+def add_passenger(agentID):
     current_app.logger.info('POST /add passenger')
     passenger_data = request.get_json()
-    
-    
-    query = '''
+    passenger_id = passenger_data.get('Id')
+
+    query1 = '''
         INSERT INTO Passenger (FirstName, LastName, DOB, Email, Id)
         VALUES (%s, %s, %s, %s, %s);
-
-        INSERT INTO PassengerTravelAgent(PassengerId, TravelAgentId)
-        VALUES(%s, %s);
     '''
-    
-    data = (
+    data1 = (
         passenger_data.get('FirstName'),
         passenger_data.get('LastName'),
         passenger_data.get('DOB'),
         passenger_data.get('Email'),
-        passenger_data.get('Id'),
-        passenger_data.get('PassengerId'),
-        passenger_data.get('TravelAgentId')
+        passenger_id
+    )
+
+    query2 = '''
+        INSERT INTO PassengerTravelAgent (PassengerId, TravelAgentId)
+        VALUES (%s, %s);
+    '''
+    data2 = (
+        passenger_id,
+        agentID
     )
 
     cursor = db.get_db().cursor()
-    cursor.execute(query, data)
+    cursor.execute(query1, data1)
+    cursor.execute(query2, data2)
     db.get_db().commit()
-    
-    return 'Passenger added!'
-    
+
+    return 'Passenger added to the given travel agent!'
     
 #------------------------------------------------------------
 # Updates the booking for the given passenger from the first flight to the second
@@ -146,7 +153,7 @@ def update_passenger(flightID1, passengerID, flightID2):
     query = """UPDATE Booked
        SET FlightNumber = %s
        WHERE PassengerId = %s AND FlightNumber = %s
-"""
+        """
 
     data = (flightID1, passengerID, flightID2)
 
@@ -155,8 +162,6 @@ def update_passenger(flightID1, passengerID, flightID2):
     db.get_db().commit()
     
     return 'Passenger updated!'
-
-
 
 #------------------------------------------------------------
 # Removes the booking for the given passenger on the given flight 
