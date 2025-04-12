@@ -106,9 +106,6 @@ def add_flight():
 
     flight_data = request.get_json()
 
-    current_app.logger.info(flight_data.get('flight_id'))
-    #current_app.logger("Here")
-
     query = '''
         INSERT INTO Flight (
             FlightNumber, ArrivalTime, DepartureTime, 
@@ -141,3 +138,19 @@ def add_flight():
     r = cursor.execute(query, data)
     db.get_db().commit()
     return 'Flight Added!'
+
+#------------------------------------------------------------
+# Returns the flights destination and arrival airport
+@flight_information.route('/flight_route/<flight_id>', methods=['GET'])
+def flight_route(flight_id):
+
+    cursor = db.get_db().cursor()
+    cursor.execute('''SELECT f.ArrivalAirportCode, f.DepartureAirportCode
+                    FROM Flight f
+                    WHERE f.FlightNumber = %s;''', (flight_id))
+    flight_data = cursor.fetchall()
+
+    # Combine into one response
+    the_response = make_response(jsonify(flight_data))
+    the_response.status_code = 200
+    return the_response
