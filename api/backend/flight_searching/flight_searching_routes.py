@@ -181,3 +181,34 @@ def get_flightlocation(DepartureAirportCode, Terminal):
     the_response.status_code = 200
     return the_response
 
+#------------------------------------------------------------
+# Search for flights with given parameters
+@flight_searching.route('/search', methods=['GET'])
+def search_flights():
+    args = request.args
+    query = '''SELECT f.FlightNumber 
+                FROM Flight f
+                JOIN Airline a ON f.AirlineId = a.Id
+                WHERE DepartureAirportCode = %s AND ArrivalAirportCode = %s'''
+    params = [args.get("from"), args.get("to")]
+
+    if args.get("date"):
+        query += " AND f.DepartureDate = %s"
+        params.append(args.get("date"))
+
+    if args.get("max_price"):
+        query += " AND f.Price <= %s"
+        params.append(args.get("max_price"))
+    
+    if args.get("airline"):
+        query += " AND a.Name = %s"
+        params.append(args.get("airline"))
+
+    cursor = db.get_db().cursor()
+    cursor.execute(query, params)
+    results = cursor.fetchall()
+
+    the_response = make_response(jsonify(results))
+    the_response.status_code = 200
+    return the_response
+

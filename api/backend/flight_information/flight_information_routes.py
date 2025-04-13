@@ -8,6 +8,7 @@ from flask import make_response
 from flask import current_app
 from backend.db_connection import db
 from backend.ml_models.model01 import predict
+import datetime
 
 #------------------------------------------------------------
 # Create a new Blueprint object, which is a collection of 
@@ -150,7 +151,61 @@ def flight_route(flight_id):
                     WHERE f.FlightNumber = %s;''', (flight_id))
     flight_data = cursor.fetchall()
 
-    # Combine into one response
+    the_response = make_response(jsonify(flight_data))
+    the_response.status_code = 200
+    return the_response
+
+#------------------------------------------------------------
+# Returns the info for a given flight
+@flight_information.route('/all_info/<flight_id>', methods=['GET'])
+def all_info(flight_id):
+
+    cursor = db.get_db().cursor()
+    cursor.execute('''SELECT f.DepartureTime, f.DepartureDate, f.ArrivalAirportCode, f.DepartureAirportCode, a.Name, f.Price
+                    FROM Flight f
+                   JOIN Airline a ON f.AirlineId = a.Id
+                   WHERE f.FlightNumber = %s;''', (flight_id))
+    flight_data = cursor.fetchall()
+
+    results = []
+
+    # Groups the date and time so that it is in a jsonifiable format
+    for row in flight_data:
+        departure_date = row['DepartureDate']
+
+        time = row['DepartureTime']
+        #If the time is in a format that isnt jsonifable change the format to the standard time format
+        if isinstance(time, datetime.timedelta):
+            jsonifiable_time = (datetime.datetime.min + time).time()
+        else:
+            jsonifiable_time = time
+        
+        departure_datetime = datetime.datetime.combine(departure_date, jsonifiable_time)
+
+        result = {
+            "ArrivalAirportCode": row["ArrivalAirportCode"],
+            "DepartureAirportCode": row["DepartureAirportCode"],
+            "Name": row["Name"],
+            "DepartureDateTime": departure_datetime.isoformat(),
+            "Price": row["Price"],
+        }
+
+        results.append(result)
+
+    the_response = make_response(jsonify(results))
+    the_response.status_code = 200
+    return the_response
+
+#------------------------------------------------------------
+# Test
+@flight_information.route('/test', methods=['GET'])
+def test():
+
+    cursor = db.get_db().cursor()
+    cursor.execute('''SELECT f.FlightNumber
+                    FROM Flight f;''')
+    flight_data = cursor.fetchall()
+
     the_response = make_response(jsonify(flight_data))
     the_response.status_code = 200
     return the_response

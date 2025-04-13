@@ -161,3 +161,31 @@ def delete_business(business_id):
 
     db.get_db().commit()
     return 'business successfully removed'
+
+#-----------------------------------------------------------
+# Returns all the aiprorts in the system
+@airports.route('/all_airports', methods=['GET'])
+def all_airports():
+    current_app.logger.info('GET /airports route')
+    cursor = db.get_db().cursor()
+    cursor.execute('''SELECT Code
+                        FROM Airport''')
+    data = cursor.fetchall()
+
+    response = make_response(jsonify(data))
+    response.status_code = 200
+    return response
+
+#-----------------------------------------------------------
+# Returns all the airlines in the system
+@airports.route('/all_airlines', methods=['GET'])
+def all_airlines():
+    current_app.logger.info('GET /all_airlines route')
+    cursor = db.get_db().cursor()
+    cursor.execute('''SELECT Name
+                        FROM Airline''')
+    data = cursor.fetchall()
+
+    response = make_response(jsonify(data))
+    response.status_code = 200
+    return response
