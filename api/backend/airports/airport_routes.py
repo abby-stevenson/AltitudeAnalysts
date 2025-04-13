@@ -153,7 +153,7 @@ def add_business(airport_code):
 # delete a specified business from the airport system
 @airports.route('/airport/<business_id>/delete-business', methods=['DELETE'])
 def delete_business(business_id):
-    current_app.logger.info('DELETE /airport/<business_id> route')
+    current_app.logger.info('DELETE /airport/<business_id>/delete-business route')
     cursor = db.get_db().cursor()
 
     cursor.execute(''' DELETE FROM Business
