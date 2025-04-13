@@ -24,18 +24,20 @@ with st.form("delete_form"):
 try:
     name = int(name_input)
 
+    if submitted:
+        
+        data = {
+            "flight_id": name,
+        }
+
+        response = requests.delete(f"http://api:4000/flight_information/delete_flight/{name}", json=data)
+
+        if response.status_code == 200:
+            
+            st.success("Flight successfully deleted!")
+        else:
+            st.error("Could not delete flight")
+
 except Exception as e:
     st.write("Please enter a valid number")
 
-if submitted:
-    data = {
-        "flight_id": name,
-    }
-
-    response = requests.delete(f"http://api:4000/flight_information/delete_flight/{name}", json=data)
-
-    if response.status_code == 200:
-        
-        st.success("Flight successfully deleted!")
-    else:
-        st.error("Could not delete flight")
