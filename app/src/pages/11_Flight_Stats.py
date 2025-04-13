@@ -10,7 +10,7 @@ st.set_page_config(layout = 'wide')
 # Display the appropriate sidebar links for the role of the logged in user
 SideBarLinks()
 
-st.title('Prediction with Regression')
+st.title('Flight History')
 
 # create a 2 column layout
 col1, col2 = st.columns(2)
@@ -36,3 +36,5 @@ if st.button('Calculate Prediction',
   results = requests.get(f'http://api:4000/c/prediction/{var_01}/{var_02}').json()
   st.dataframe(results)
   
+
+  st.write("## Average Occupancy Rate")
