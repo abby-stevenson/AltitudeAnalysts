@@ -1,7 +1,8 @@
 from flask import Flask
 
 from backend.db_connection import db
-from backend.simple.simple_routes import simple_routes
+from backend.passenger_metrics.passenger_metrics_routes import passenger_metrics
+from backend.flight_searching.flight_searching_routes import flight_searching
 from backend.flight_information.flight_information_routes import flight_information
 from backend.flight_stats.flight_stats_routes import flight_stats
 from backend.airports.airport_routes import airports
@@ -44,6 +45,7 @@ def create_app():
     app.register_blueprint(flight_information,  url_prefix='/flight_information')
     app.register_blueprint(flight_stats, url_prefix='/fs')
     app.register_blueprint(airports,    url_prefix='/z')
+    app.register_blueprint(passenger_metrics, url_prefix='/pm')
 
     # Don't forget to return the app object
     return app
