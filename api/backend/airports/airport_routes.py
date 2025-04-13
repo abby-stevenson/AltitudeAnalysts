@@ -130,15 +130,14 @@ def update_gate_number(flight_id, gate_id):
     return 'gate updated'
     
 #-----------------------------------------------------------
-# delete a specified businesses from the airport system
+# delete a specified businesses from the airport system if it is closed
 @airports.route('/airport/<business_id>', methods=['DELETE'])
-
 def delete_business(business_id):
     current_app.logger.info('DELETE /airport/<business_id> route')
     cursor = db.get_db().cursor()
-    cursor.execute('''DELETE FROM Business
-                   WHERE Id = %s
-                   AND OpenOrClose = 0''', (business_id))
+
+    cursor.execute(''' DELETE FROM Business
+                   WHERE Id = %s''', (business_id))
 
     db.get_db().commit()
-    return 'business successfully deleted'
+    return 'business successfully removed'
