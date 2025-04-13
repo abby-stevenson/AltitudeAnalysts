@@ -8,12 +8,12 @@ import datetime
 
 SideBarLinks()
 
-st.write("# Add a Flight or Change Flight Information")
+st.write("# Add Flight Information")
 
-with st.form("add_change_form"):
+with st.form("add_form"):
   option = st.radio(
       "Choose an action:",
-      ["Add a flight", "Change a flight"],
+      ["Add a flight"],
       horizontal=True 
     )
   st.write("Please enter all fields")
