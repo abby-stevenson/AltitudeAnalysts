@@ -130,7 +130,7 @@ def update_gate_number(flight_id, gate_id):
     return 'gate updated'
     
 #-----------------------------------------------------------
-# delete a specified businesses from the airport system if it is closed
+# delete a specified businesses from the airport system
 @airports.route('/airport/<business_id>', methods=['DELETE'])
 def delete_business(business_id):
     current_app.logger.info('DELETE /airport/<business_id> route')
