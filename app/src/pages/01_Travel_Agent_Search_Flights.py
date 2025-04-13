@@ -8,34 +8,37 @@ import matplotlib.pyplot as plt
 import numpy as np
 import plotly.express as px
 from modules.nav import SideBarLinks
+import requests
 
 # Call the SideBarLinks from the nav module in the modules directory
 SideBarLinks()
 
-# set the header of the page
-st.header('World Bank Data')
+# user 1, 1 and 3
+# /f/flight_searching/{date1}/{date2}
+# /f/flight_searching/{airlineID}
 
-# You can access the session state to make a more customized/personalized app experience
-st.write(f"### Hi, {st.session_state['first_name']}.")
+# "http://api:4000/f/flight_searching/<date1>/<date2>"
 
-# get the countries from the world bank data
-with st.echo(code_location='above'):
-    countries:pd.DataFrame = wb.get_countries()
-   
-    st.dataframe(countries)
+col1, col2, col3 = st.columns(3)
 
-# the with statment shows the code for this block above it 
-with st.echo(code_location='above'):
-    arr = np.random.normal(1, 1, size=100)
-    test_plot, ax = plt.subplots()
-    ax.hist(arr, bins=20)
+response = requests.get("http://api:4000/f/flight_searching/<date1>/<date2>")
+response = requests.get("http://api:4000/f/flight_searching/<airlineID>")
 
-    st.pyplot(test_plot)
+# Add select box to the first column
+with col1:
+    text_input = st.text_input(
+    "Search Flights",
+    key="placeholder")
+    st.write(text_input)
+    date = st.selectbox("Dates", ["3/4", "3/5", "3/6"])
+    airline = st.selectbox("Airline", ["United", "Spirit", "RyanAir"])
+    price = st.selectbox("Price", ["$450", "$250", "$20"])
+    num_stops = st.selectbox("Stops", ["0", "1", "2"])
+    duration = st.selectbox("Total Duration", ["180", "450", "320"])
 
+# Add select box to the second column
+with col2:
+    option1 = st.selectbox("From", ["BOS", "LHR", "LTN"])
 
-with st.echo(code_location='above'):
-    slim_countries = countries[countries['incomeLevel'] != 'Aggregates']
-    data_crosstab = pd.crosstab(slim_countries['region'], 
-                                slim_countries['incomeLevel'],  
-                                margins = False) 
-    st.table(data_crosstab)
+with col3:
+    option2 = st.selectbox("To", ["BOS", "LHR", "LTN"])
