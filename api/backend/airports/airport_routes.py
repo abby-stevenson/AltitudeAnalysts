@@ -14,18 +14,18 @@ from backend.ml_models.model01 import predict
 airports = Blueprint('airports', __name__)
 
 #-----------------------------------------------------------
-# get airport metrics for a specificied airport
-@airports.route('/airports/<airport_id>/airport-metrics', methods=['GET'])
-def get_airport_metrics(airport_id):
+# get airport metrics for a passenger's departure airport
+@airports.route('/flights/<passenger_id>/airport-metrics', methods=['GET'])
+def get_airport_metrics(passenger_id):
     current_app.logger.info('GET /airports/<airport_id> route')
     cursor = db.get_db().cursor()
-    cursor.execute('''SELECT a.Disrupted, a.SecurityWaitTime
+    cursor.execute('''SELECT a.Code, a.Disrupted, a.SecurityWaitTime
                     From Airport a
                         JOIN Flight f ON f.DepartureAirportCode = a.Code
                         JOIN Booked b ON b.FlightNumber = f.FlightNumber
                         JOIN Passenger p ON p.Id = b.PassengerId
                     WHERE p.Id = %s
-    ''', (airport_id))
+    ''', (passenger_id))
     data = cursor.fetchall()
 
     response = make_response(jsonify(data))
@@ -83,10 +83,10 @@ def get_peak_days(airport_id):
     current_app.logger.info('GET /flights/<airport_id> route')
     cursor = db.get_db().cursor()
     cursor.execute('''SELECT DepartureDate, COUNT(*) AS FlightsPerDay
-                        FROM Flight
-                        WHERE DepartureAirportCode = %s
-                        GROUP BY DepartureDate
-                        ORDER BY FlightsPerDay DESC
+                    FROM Flight
+                    WHERE DepartureAirportCode = %s
+                    GROUP BY DepartureDate
+                    ORDER BY FlightsPerDay DESC
     ''', (airport_id))
 
     data = cursor.fetchall()
@@ -102,8 +102,8 @@ def get_disruption_status(airport_id):
     current_app.logger.info('GET /flights/<airport_id> route')
     cursor = db.get_db().cursor()
     cursor.execute('''SELECT Code, Disrupted
-                        FROM Airport
-                        WHERE Code = %s
+                    FROM Airport
+                    WHERE Code = %s
     ''', (airport_id))
     data = cursor.fetchall()
 
@@ -120,23 +120,25 @@ def update_gate_number(flight_id, gate_id):
     cursor = db.get_db().cursor()
 
     cursor.execute('''UPDATE Flight
-                        SET Gate = %s
-                        WHERE FlightNumber = %s
-                        AND Status IN (
-                            SELECT Id FROM Status WHERE OnTime != 1)
+                    SET Gate = %s
+                    WHERE FlightNumber = %s
+                    AND Status IN (
+                        SELECT Id FROM Status WHERE OnTime != 1)
     ''', (gate_id, flight_id))
 
     db.get_db().commit()
     return 'gate updated'
     
 #-----------------------------------------------------------
-# delete closed businesses from the airport system
-@airports.route('/airport/delete-closed-businesses', methods=['DELETE'])
-def delete_business():
-    current_app.logger.info('DELETE /airport/<businesses> route')
+# delete a specified businesses from the airport system
+@airports.route('/airport/<business_id>', methods=['DELETE'])
+
+def delete_business(business_id):
+    current_app.logger.info('DELETE /airport/<business_id> route')
     cursor = db.get_db().cursor()
-    cursor.execute('DELETE FROM Business WHERE OpenOrClose = 0')
-    
+    cursor.execute('''DELETE FROM Business
+                   WHERE Id = %s
+                   AND OpenOrClose = 0''', (business_id))
+
     db.get_db().commit()
-    
-    return  'all closed businesses deleted!'
+    return 'business successfully deleted'
