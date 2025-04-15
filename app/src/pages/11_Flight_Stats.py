@@ -10,6 +10,8 @@ st.set_page_config(layout = 'wide')
 # Display the appropriate sidebar links for the role of the logged in user
 SideBarLinks()
 
+# Person 2: Airline Manager, User Stories 1 - 5
+
 st.title('Flight History')
 
 # create a 2 column layout

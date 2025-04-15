@@ -10,29 +10,30 @@ st.set_page_config(layout = 'wide')
 # Display the appropriate sidebar links for the role of the logged in user
 SideBarLinks()
 
-st.title('Prediction with Regression')
+# Person 1, User Story 2
+# As a travel agent, I want to view a list of flights that my customers 
+# have booked onto so that I can manage their itineraries effectively.
 
-# create a 2 column layout
-col1, col2 = st.columns(2)
+st.title('Flights Customers Have Booked')
 
-# add one number input for variable 1 into column 1
-with col1:
-  var_01 = st.number_input('Variable 01:',
-                           step=1)
+passenger_id_input = st.text_input("Enter the Passenger ID of the customer you want to check:")
+if st.button("Get Booked Flights"):
+    if not passenger_id_input.isdigit():
+       st.warning("Please enter a valid numeric Passenger ID.")
+    else:
+       passenger_id = int(passenger_id_input)
+    try:
+       response = requests.get(f"http://api:4000/pm/flight_information/{passenger_id}")
 
-# add another number input for variable 2 into column 2
-with col2:
-  var_02 = st.number_input('Variable 02:',
-                           step=1)
 
-logger.info(f'var_01 = {var_01}')
-logger.info(f'var_02 = {var_02}')
+       if response.status_code == 200:
+          data = response.json()
+          if data:
+             flight_nums = [data['FlightNumber'] for item in data]
+             st.header(f"Passenger #{passenger_id} has the following flights booked:")
+             for num in flight_nums:
+                st.write(f"Flight Number: {num}")
 
-# add a button to use the values entered into the number field to send to the 
-# prediction function via the REST API
-if st.button('Calculate Prediction',
-             type='primary',
-             use_container_width=True):
-  results = requests.get(f'http://api:4000/c/prediction/{var_01}/{var_02}').json()
-  st.dataframe(results)
-  
+                try:
+                   
+             
