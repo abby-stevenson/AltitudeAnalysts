@@ -27,11 +27,7 @@ def SearchForFlights():
     st.sidebar.page_link(
         "pages/01_Travel_Agent_Search_Flights.py", label="Search for Flights")
     ##icon="🏦"
-
-
-def SeatMap():
-    st.sidebar.page_link("pages/02_Seat_Map.py", label="View Seat Map Current Availability and Price")
-    ##icon="🗺️"
+    
 
 def AddPassenger():
     st.sidebar.page_link("pages/03_Add_Passenger.py", label="Add Passenger")

@@ -19,11 +19,6 @@ if st.button('Search for Flights',
              use_container_width=True):
   st.switch_page('pages/01_Travel_Agent_Search_Flights.py')
 
-if st.button('View Seat Map Current Availability and Price', 
-             type='secondary',
-             use_container_width=True):
-  st.switch_page('pages/02_Seat_Map.py')
-
 if st.button('Add a New Passenger', 
              type='secondary',
              use_container_width=True):
