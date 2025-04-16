@@ -1,6 +1,7 @@
 import requests
 import streamlit as st
 from modules.nav import SideBarLinks
+import datetime
 
 SideBarLinks()
 
@@ -22,7 +23,10 @@ elif passenger_id:
 
             for flight in data:
                 num = flight.get("FlightNumber")
-                info = f"Flight {num} from {flight.get('DepartureAirportCode')} to {flight.get('ArrivalAirportCode')} on {flight.get('DepartureDate')}"
+                date = flight.get("DepartureDate")
+
+                adj_date = datetime.datetime.strptime(date, "%a, %d %b %Y %H:%M:%S %Z").date()
+                info = f"Flight {num} from {flight.get('DepartureAirportCode')} to {flight.get('ArrivalAirportCode')} on {adj_date}"
                 display.append(info)
                 mapping[info] = num
         
@@ -57,5 +61,6 @@ elif passenger_id:
             except:
                 st.error(f"Unable to retrieve airport metrics. Please try again.")
     
-    except:
+    except Exception as e:
         st.error("Unable to fetch flight information. Please try again.")
+        st.text(f"Error: {e}")
