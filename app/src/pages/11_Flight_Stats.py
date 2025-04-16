@@ -18,34 +18,12 @@ SideBarLinks()
 
 st.title('Flight Statistics')
 airline_manager_input = st.text_input("Enter the Airline ID:", key="AirlineId")
-date_input = st.date_input("Enter the date:", key = "DepartureDate")
 
 if st.button("Submit"):
     if not airline_manager_input.isdigit():
         st.warning("Please enter a valid numeric Airline ID")
     else:
         airline_id = int(airline_manager_input)
-
-    try:
-
-        onTimeRate_response = requests.get(f"http://api:4000/fs/flights/{airline_id}/onTimeRate")
-
-        if onTimeRate_response.status_code == 200:
-            onTime_data = onTimeRate_response.json()
-            st.write("### On-Time Rate for all dates")
-            st.write(onTime_data[0]['OnTimePercentage'])
-            #if onTime_data:
-            #    st.subheader(f"On-Time Rate for all dates")
-            #    for item in onTime_data:
-            #        if item['DepartureDate'] == date_input:
-            #            st.write("On-Time Rate:", item['OnTime'])
-            #            st.write("Departure Date:", item['DepartureDate'])
-            #    on_time_rate = [item['DepartureDate'] for item in onTime_data]
-            #    st.write(date_input)
-
-    except Exception as e:
-        st.error("Unable to find on-time rate. Try Again")
-    
 
     try:
         response = requests.get(f"http://api:4000/fs/flights/{airline_id}/occupancyRate")
@@ -88,10 +66,14 @@ if st.button("Submit"):
         delays_request = requests.get(f"http://api:4000/fs/flightDelays/{airline_id}")
         if delays_request.status_code == 200:
             delay_data = delays_request.json()
+            delay_reason = []
+            delay_count = []
+            
             if delay_data:
                 st.write("### Most Common Reasons for Flight Delays for Your Airline")
                 table_data = [(k, int(v)) for k, v in delay_data[0].items()]
-                st.table([["Reason", "Count"]] + table_data)
+                df = pd.DataFrame(table_data, columns=["Reason", "Count"])
+                st.table(df)
             else:
                 st.warning("No delay data returned.")
         else:
