@@ -7,7 +7,6 @@ from flask import jsonify
 from flask import make_response
 from flask import current_app
 from backend.db_connection import db
-from backend.ml_models.model01 import predict
 
 #-----------------------------------------------------------
 # create a new blueprint object
@@ -125,6 +124,22 @@ def update_gate_number(flight_id, gate_id):
     return 'gate updated'
 
 #-----------------------------------------------------------
+# gets all businesses
+@airports.route('/airport/businesses', methods=['GET'])
+def get_businesses():
+    current_app.logger.info('GET/airport/businesses route')
+    cursor = db.get_db().cursor()
+    cursor.execute('''SELECT Id, Name, Type, AirportCode, OpenOrClose
+                   FROM Business 
+    ''')
+    
+    data = cursor.fetchall()
+
+    response = make_response(jsonify(data))
+    response.status_code = 200
+    return response
+
+#-----------------------------------------------------------
 # add a business to the airport system
 @airports.route('/airport/<airport_code>/add-business', methods=['POST'])
 def add_business(airport_code):
@@ -158,7 +173,7 @@ def delete_business(business_id):
     return 'business successfully removed'
 
 #-----------------------------------------------------------
-# Returns all the aiprorts in the system
+# Returns all the airports in the system
 @airports.route('/all_airports', methods=['GET'])
 def all_airports():
     current_app.logger.info('GET /airports route')
