@@ -27,7 +27,7 @@ def SearchForFlights():
     st.sidebar.page_link(
         "pages/01_Travel_Agent_Search_Flights.py", label="Search for Flights")
     ##icon="🏦"
-    
+
 
 def AddPassenger():
     st.sidebar.page_link("pages/03_Add_Passenger.py", label="Add Passenger")
@@ -59,7 +59,7 @@ def PassengerHome():
     st.sidebar.page_link("pages/20_Passenger_Home.py", label="Passenger Home")
 
 def FlightStatus():
-    st.sidebar.page_link("pages/21_Flight_Status.py", label="See the Status of Your Flight")
+    st.sidebar.page_link("pages/21_Flight_Status.py", label="See Status and Airport Metrics For Your Flight")
     
 def BoardingPass():
     st.sidebar.page_link("pages/22_Boarding_Pass.py", label="Access Boarding Pass and Change Class")
@@ -76,7 +76,7 @@ def FlightStatsTerminal():
     st.sidebar.page_link("pages/31_Flight_Stats_Terminal.py", label="See All The Flights Departing From A Specific Terminal")
     
 def Businesses():
-    st.sidebar.page_link("pages/32_Businesses.py", label="See Businesses Operating in Your Airport")
+    st.sidebar.page_link("pages/32_Businesses.py", label="Manage Businesses Operating in Your Airport")
 
 def MonitorFlights():
     st.sidebar.page_link("pages/33_Monitor_Flights.py", label="Monitor and Update Flight Information")

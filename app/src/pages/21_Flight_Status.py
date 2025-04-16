@@ -16,7 +16,7 @@ elif passenger_id:
         data = requests.get(f"http://api:4000/pm/flight_information/{passenger_id}").json()
         
         if data:
-            st.subheader("Previously Booked Flights")
+            st.subheader("Booked Flights")
             display = []
             mapping = {}
 
