@@ -16,7 +16,6 @@ SideBarLinks()
 
 # Person 2: Airline Manager, User Stories 1 - 5
 
-
 st.title('Flight Statistics')
 airline_manager_input = st.text_input("Enter the Airline ID:", key="AirlineId")
 date_input = st.date_input("Enter the date:", key = "DepartureDate")
@@ -86,11 +85,15 @@ if st.button("Submit"):
         st.error("Unable to find occupancy rate. Try Again")
 
     try:
-        delays_request = requests.get(f"http://api:4000/fs/flights/{airline_id}")
+        delays_request = requests.get(f"http://api:4000/fs/flightDelays/{airline_id}")
         if delays_request.status_code == 200:
             delay_data = delays_request.json()
-            st.write("### Common Reasons for Flight Delays")
-            st.write(delay_data)
+            if delay_data:
+                st.write("### Most Common Reasons for Flight Delays for Your Airline")
+                table_data = [(k, int(v)) for k, v in delay_data[0].items()]
+                st.table([["Reason", "Count"]] + table_data)
+            else:
+                st.warning("No delay data returned.")
         else:
             st.warning("No delay data found for this airline.")
     except Exception as e:

@@ -77,7 +77,7 @@ def get_avg_occupancy(airlineID):
 #------------------------------------------------------------
 # Returns common reasons for flight delays
 
-@flight_stats.route('/flights/<airlineID>', methods=['GET'])
+@flight_stats.route('/flightDelays/<airlineID>', methods=['GET'])
 def reasons_flight_delays(airlineID):
     current_app.logger.info('GET /flights/<airlineID> route')
     cursor = db.get_db().cursor()
