@@ -125,6 +125,26 @@ def update_gate_number(flight_id, gate_id):
     return 'gate updated'
 
 #-----------------------------------------------------------
+# add a business to the airport system
+@airports.route('/airport/<airport_code>/add-business', methods=['POST'])
+def add_business(airport_code):
+    current_app.logger.info('POST /airport/<airport_code>/add-business route')
+
+    data = request.get_json()
+    
+    business_id = data.get('Id')
+    name = data.get('Name')
+    business_type = data.get('Type')
+
+    cursor = db.get_db().cursor()
+    cursor.execute(''' INSERT INTO Business(Id, Name, Type, AirportCode, OpenOrClose)
+                   VALUES (%s, %s, %s, %s, 1)
+    ''', (business_id, name, business_type, airport_code))
+
+    db.get_db().commit()
+    return 'business successfully added'
+
+#-----------------------------------------------------------
 # delete closed businesses from the airport system
 @airports.route('/airport/delete-closed-businesses', methods=['DELETE'])
 def delete_business():
