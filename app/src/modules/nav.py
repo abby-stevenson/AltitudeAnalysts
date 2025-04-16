@@ -108,7 +108,6 @@ def SideBarLinks(show_home=False):
         if st.session_state["role"] == "Travel_Agent":
             TravelAgentHome()
             SearchForFlights()
-            SeatMap()
             AddPassenger()
             CustomerFlights()
 
