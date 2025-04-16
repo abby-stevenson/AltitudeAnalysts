@@ -16,7 +16,7 @@ if st.button('See All The Flights Departing From A Specific Terminal',
              use_container_width=True):
   st.switch_page('pages/31_Flight_Stats_Terminal.py')
 
-if st.button('See Businesses Operating in Your Airport', 
+if st.button('Manage Businesses Operating in Your Airport', 
              type='secondary',
              use_container_width=True):
   st.switch_page('pages/32_Businesses.py')

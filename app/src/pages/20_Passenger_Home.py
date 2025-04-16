@@ -11,7 +11,7 @@ SideBarLinks()
 
 st.title('Passenger Home Page')
 
-if st.button('See the Status of Your Flight', 
+if st.button('See Status and Airport Metrics For Your Flight', 
              type='secondary',
              use_container_width=True):
   st.switch_page('pages/21_Flight_Status.py')
