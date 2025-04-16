@@ -7,6 +7,7 @@ from flask import jsonify
 from flask import make_response
 from flask import current_app
 from backend.db_connection import db
+import datetime
 
 #------------------------------------------------------------
 # Create a new Blueprint object, which is a collection of 
@@ -92,18 +93,48 @@ def passenger_flights_status(passenger_id):
 
 #------------------------------------------------------------
 # Gets url of boarding pass for the given passenger for the given flight
-@passenger_metrics.route('/boarding_pass/<passenger_id>/<flight_id>', methods=['GET'])
-def passenger_boarding_pass(passenger_id, flight_id):
+@passenger_metrics.route('/boarding_pass/<passenger_id>/<flight_id>/<seat_id>', methods=['GET'])
+def passenger_boarding_pass(passenger_id, flight_id, seat_id):
     cursor = db.get_db().cursor()
-    cursor.execute("""SELECT b.BoardingPass
+    cursor.execute("""SELECT BoardingPass, SeatNumber, ArrivalTime, DepartureTime, s.Class
                         FROM Booked b
                             JOIN Passenger p ON p.Id = b.PassengerId
                             JOIN Flight f ON f.FlightNumber = b.FlightNumber
-                        WHERE p.Id = %s AND b.FlightNumber = %s""", (passenger_id, flight_id))
+                            JOIN Seat s ON s.FlightNumber = f.flightNumber
+                        WHERE p.Id = %s AND b.FlightNumber = %s AND s.SeatNumber = %s""", (passenger_id, flight_id, seat_id))
     
     data = cursor.fetchall()
-    
-    response = make_response(jsonify(data))
+
+    results = []
+
+    # Groups the date and time so that it is in a jsonifiable format
+    for row in data:
+        d_time = row['DepartureTime']
+        a_time = row['ArrivalTime']
+        
+        # Convert timedelta to standard time format if needed
+        if isinstance(d_time, datetime.timedelta):
+            jsonifiable_d_time = (datetime.datetime.min + d_time).time()
+        else:
+            jsonifiable_d_time = d_time
+
+        if isinstance(a_time, datetime.timedelta):
+            jsonifiable_a_time = (datetime.datetime.min + a_time).time()
+        else:
+            jsonifiable_a_time = d_time
+
+        result = {
+            "BoardingPass": row["BoardingPass"],
+            "SeatNumber": row["SeatNumber"],
+            "FlightNumber": int(flight_id),
+            "DepartureTime": jsonifiable_d_time.isoformat(),
+            "ArrivalTime": jsonifiable_a_time.isoformat(),
+            "Class": row['Class']
+        }
+
+    results.append(result)
+
+    response = make_response(jsonify(results))
     response.status_code = 200
     return response
 
@@ -166,7 +197,7 @@ def update_passenger(flightID1, passengerID, flightID2):
 #------------------------------------------------------------
 # Removes the booking for the given passenger on the given flight 
 @passenger_metrics.route('/delete_booking/<flightID>/<passengerID>', methods=['DELETE'])
-def delete_passenger(flightID, passengerID):
+def delete_booking(flightID, passengerID):
     current_app.logger.info('DELETE /delete booking')
     
     query = """DELETE FROM Booked
