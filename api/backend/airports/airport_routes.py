@@ -14,18 +14,16 @@ from backend.ml_models.model01 import predict
 airports = Blueprint('airports', __name__)
 
 #-----------------------------------------------------------
-# get airport metrics for a passenger's departure airport
-@airports.route('/flights/<passenger_id>/airport-metrics', methods=['GET'])
-def get_airport_metrics(passenger_id):
-    current_app.logger.info('GET /airports/<airport_id> route')
+# get airport metrics for a flight's departure airport
+@airports.route('/flights/<flight_number>/airport-metrics', methods=['GET'])
+def get_airport_metrics(flight_number):
+    current_app.logger.info('GET /airports/<flight_number>/airport-metrics route')
     cursor = db.get_db().cursor()
     cursor.execute('''SELECT a.Code, a.Disrupted, a.SecurityWaitTime
                     From Airport a
-                        JOIN Flight f ON f.DepartureAirportCode = a.Code
-                        JOIN Booked b ON b.FlightNumber = f.FlightNumber
-                        JOIN Passenger p ON p.Id = b.PassengerId
-                    WHERE p.Id = %s
-    ''', (passenger_id))
+                    JOIN Flight f ON f.DepartureAirportCode = a.Code
+                    WHERE f.FlightNumber = %s
+    ''', (flight_number))
     data = cursor.fetchall()
 
     response = make_response(jsonify(data))
