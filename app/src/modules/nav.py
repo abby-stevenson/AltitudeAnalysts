@@ -79,7 +79,7 @@ def Businesses():
     st.sidebar.page_link("pages/32_Businesses.py", label="Manage Businesses Operating in Your Airport")
 
 def MonitorFlights():
-    st.sidebar.page_link("pages/33_Monitor_Flights.py", label="Monitor and Update Flight Information")
+    st.sidebar.page_link("pages/33_Monitor_Flights.py", label="Change Gate of Flight")
 
 
 # --------------------------------Links Function -----------------------------------------------

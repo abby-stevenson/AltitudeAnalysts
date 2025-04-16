@@ -188,7 +188,7 @@ def all_airlines():
 
 
 #-----------------------------------------------------------
-# Returns all the airlines in the system
+# Returns A flight number if it is the system
 @airports.route('/airport/<FlightNumber>/exists', methods=['GET'])
 def get_flightinfo(FlightNumber): 
     cursor = db.get_db().cursor()

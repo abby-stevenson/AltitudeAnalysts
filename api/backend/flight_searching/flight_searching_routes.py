@@ -13,7 +13,7 @@ import datetime
 flight_searching = Blueprint('flight_searching', __name__)
 
 #------------------------------------------------------------
-# Returns all flights between these two dates [Stacy-1] 
+# Returns all flights between these two dates 
 @flight_searching.route('/flight_searching/<Date1>/<Date2>', methods=['GET'])
 
 def get_flightdates(Date1 ,Date2):
@@ -56,7 +56,7 @@ def get_flightdates(Date1 ,Date2):
     return the_response
 
 #------------------------------------------------------------
-# Returns all the flights with their prices for a specific airline [Stacy-3] COMPLETE
+# Returns all the flights with their prices for a specific airline 
 @flight_searching.route('/flight_searching/<Id>', methods=['GET']) 
 
 def get_prices(Id):
@@ -74,7 +74,7 @@ WHERE a.Id = {0};
     return the_response
 
 #------------------------------------------------------------
-# Returns seat location and price information for the given flight [Stacy-5] COMPLETE
+# Returns seat location and price information for the given flight 
 
 @flight_searching.route('/flight_searching/<FlightNumber>/flightinfo', methods=['GET'])
 
@@ -93,7 +93,7 @@ WHERE f.FlightNumber = {0};
     return the_response
 
 #------------------------------------------------------------ 
-# Returns all the flights leaving from the given airport [Liam-5] -COMPLETE
+# Returns all the flights leaving from the given airport 
 
 @flight_searching.route('/flight_searching/<DepartureAirportCode>/location', methods=['GET'])
 
@@ -136,7 +136,7 @@ def get_flightlocationAirport(DepartureAirportCode):
     return the_response
 
 #------------------------------------------------------------
-# Returns all flights leaving from a given terminal at a given airport [Liam-7]
+# Returns all flights leaving from a given terminal at a given airport 
 
 @flight_searching.route('/terminal/<DepartureAirportCode>/<Terminal>', methods=['GET'])
 def get_flightlocation(DepartureAirportCode, Terminal): 

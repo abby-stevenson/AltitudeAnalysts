@@ -21,7 +21,7 @@ if st.button('Manage Businesses Operating in Your Airport',
              use_container_width=True):
   st.switch_page('pages/32_Businesses.py')
 
-if st.button("Change gate of Flight",
+if st.button("Change Gate of Flight",
              type='secondary',
              use_container_width=True):
   st.switch_page('pages/33_Monitor_Flights.py')

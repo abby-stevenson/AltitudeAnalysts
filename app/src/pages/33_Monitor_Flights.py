@@ -17,13 +17,20 @@ Gate_input = st.text_input("Enter New Gate Number:", key="GateNumber")
 
 if st.button("Change Gate"):
     try:
-        response = requests.put(
-            f"http://api:4000/z/flights/{Flight_input}/{Gate_input}"
-        )
-
-        if response.status_code == 200:
-            st.success("Gate updated successfully!")
+        test = requests.get(f"http://api:4000/z/airport/{Flight_input}/exists")
+        if test.json():
+            try:
+                response = requests.put(
+                    f"http://api:4000/z/flights/{Flight_input}/{Gate_input}"
+                )
+                if response.status_code == 200:
+                    st.success("Gate updated successfully!")
+                else:
+                    st.warning(f"Failed to update gate. Status code: {response.status_code}")       
+            except Exception as e:
+                st.warning(f"Cannot connect to the database")
         else:
-            st.warning(f"Failed to update gate. Status code: {response.status_code}")
+            st.warning(f"The Flight Number you entered doesn't exist") 
     except Exception as e:
-        st.warning(f"Cannot connect to the database")
+        st.warning(f"Cannot connect")
+    
