@@ -54,8 +54,8 @@ with st.form("add_change_form"):
 
       else:
         st.warning("Booking not found, please check flight ID or seat number")
-    except:
-      st.warning("One or more of your values is non-numeric.")
+    except Exception as e:
+      st.error("Error connecting. Try again later")
  
 
 
@@ -66,18 +66,27 @@ if st.session_state['successful_execution'] == True:
     class_original = st.session_state['class_name']
 
     st.write('You are in', class_original, 'class')
-      
-    class_name = st.text_input("Which class would you like to move to? (First, Premium Economy, Business, Economy)")
     
+    class_name = st.text_input("Which class would you like to move to? (First, Premium Economy, Business, Economy)")
+
     submitted = st.form_submit_button("Submit")
     if submitted:
-      if class_name == class_original:
-        st.warning('You are already in that class!')
-      else:
-        response_seat_change = requests.put(f"http://api:4000/flight_information/seatChange/{seat_id}/{flight_id}/{class_name}")
-            
-
-        if response_seat_change.status_code == 200:
-          st.success("Booking updated!")
+      check = True
+      if class_name != "Economy" or class_name != "Premium Economy" or class_name != "Business" or class_name != "First":
+        st.warning("Please enter a valid class name")
+        check = False
+      
+      if check:
+        if class_name == class_original:
+          st.warning('You are already in that class!')
         else:
-          st.error("Booking not updated")
+          try:
+            response_seat_change = requests.put(f"http://api:4000/flight_information/seatChange/{seat_id}/{flight_id}/{class_name}")
+                
+
+            if response_seat_change.status_code == 200:
+              st.success("Booking updated!")
+            else:
+              st.error("Booking not updated")
+          except Exception as e:
+            st.error("Error connecting. Try again later")

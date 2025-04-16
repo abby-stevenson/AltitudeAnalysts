@@ -58,4 +58,4 @@ with st.form("add_change_form"):
                 st.error("Could not add passenger, check if Agent ID is valid or Passenger ID is already taken")
 
         except Exception as e:
-            st.error(f"Error connecting. Try again later")
+            st.error("Error connecting. Try again later")
