@@ -12,31 +12,16 @@ SideBarLinks()
 
 # Person 2: Airline Manager, User Stories 1 - 5
 
-st.title('Flight History')
+st.title('Flight Statistics')
+airline_manager_input = st.text_input("Enter the Airline ID:")
 
-# create a 2 column layout
-col1, col2 = st.columns(2)
+if st.button("Submit"):
+    if not airline_manager_input.isdigit():
+        st.warning("Please enter a valid numeric Airline ID")
+    else:
+        airline_id = int(airline_manager_input)
+    try:
+        
 
-# add one number input for variable 1 into column 1
-with col1:
-  var_01 = st.number_input('Variable 01:',
-                           step=1)
 
-# add another number input for variable 2 into column 2
-with col2:
-  var_02 = st.number_input('Variable 02:',
-                           step=1)
-
-logger.info(f'var_01 = {var_01}')
-logger.info(f'var_02 = {var_02}')
-
-# add a button to use the values entered into the number field to send to the 
-# prediction function via the REST API
-if st.button('Calculate Prediction',
-             type='primary',
-             use_container_width=True):
-  results = requests.get(f'http://api:4000/c/prediction/{var_01}/{var_02}').json()
-  st.dataframe(results)
-  
-
-  st.write("## Average Occupancy Rate")
+st.write("## Average Occupancy Rate")
