@@ -25,7 +25,7 @@ with col1:
             st.error("Failed to fetch airlines from the server.")
             airline_names = []
     except Exception as e:
-        st.error(f"Error fetching airlines. Try again later {e}")
+        st.error(f"Error fetching airlines. Try again later")
         airline_names = []
 
     airline = st.selectbox("Airline", ["Select an Airline"] + airline_names)
