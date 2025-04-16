@@ -207,3 +207,22 @@ def delete_booking(flightID, passengerID):
     r = cursor.execute(query, data)
     db.get_db().commit()
     return 'Booking Deleted!'
+
+
+
+# Returns passenger if it is the system
+@passenger_metrics.route('/checkpassenger/<PassengerId>/exists', methods=['GET'])
+def get_flightinfo(PassengerId): 
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        SELECT PassengerId
+        FROM Passenger
+        WHERE PassengerId = {0}; 
+    '''.format(PassengerId))
+
+    theData = cursor.fetchall()
+    
+    the_response = make_response(jsonify(theData))
+    the_response.status_code = 200
+    return the_response
+
