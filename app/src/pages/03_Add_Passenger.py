@@ -47,10 +47,15 @@ with st.form("add_change_form"):
 
         agentID = int(agent_id)
 
-        response = requests.post(f"http://api:4000/pm/add_passenger/{agentID}/passenger", json=data)
+        try:
 
-        if response.status_code == 200:
-                
-            st.success("Passenger successfully added!")
-        else:
-            st.error("Could not add passenger, check if Agent ID is valid or Passenger ID is already taken")
+            response = requests.post(f"http://api:4000/pm/add_passenger/{agentID}/passenger", json=data)
+
+            if response.status_code == 200:
+                    
+                st.success("Passenger successfully added!")
+            else:
+                st.error("Could not add passenger, check if Agent ID is valid or Passenger ID is already taken")
+
+        except Exception as e:
+            st.error(f"Error connecting. Try again later")
