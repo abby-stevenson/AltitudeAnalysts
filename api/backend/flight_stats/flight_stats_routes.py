@@ -23,7 +23,11 @@ flight_stats = Blueprint('flight stats', __name__)
 def get_flights(date):
     current_app.logger.info('GET /flights/<date> route')
     cursor = db.get_db().cursor()
-    cursor.execute('SELECT f.DepartureDate, (SUM(s.OnTime) / COUNT(*) * 100) AS OnTimePercentage FROM Flight f JOIN Status s ON f.Status = s.Id WHERE AirlineId = 1 GROUP BY f.DepartureDate ORDER BY f. DepartureDate;') 
+    cursor.execute('SELECT f.DepartureDate, '
+    '(SUM(s.OnTime) / COUNT(*) * 100) AS OnTimePercentage ' \
+    'FROM Flight f JOIN Status s ON f.Status = s.Id ' \
+    'WHERE AirlineId = 1 GROUP BY f.DepartureDate ' \
+    'ORDER BY f. DepartureDate;') 
     
     theData = cursor.fetchall()
     the_response = make_response(jsonify(theData))
@@ -39,7 +43,12 @@ def get_flights(date):
 def get_on_time_rate(airlineID):
     current_app.logger.info('GET /flights/<airlineID>/onTimeRate route')
     cursor = db.get_db().cursor()
-    cursor.execute('SELECT f.AirlineId, a.Name AS AirlineName, (SUM(s.OnTime) / COUNT(s.OnTime) * 100) AS OnTimePercentage FROM Flight f JOIN Status s ON f.Status = s.Id JOIN Airline a ON f.AirlineId = a.Id GROUP BY f.AirlineId, a.Name ORDER BY OnTimePercentage DESC;')
+    cursor.execute('SELECT f.AirlineId, a.Name AS AirlineName, '
+    '(COUNT(s.OnTime) / COUNT(f.FlightNumber) * 100) AS OnTimePercentage ' \
+    'FROM Flight f JOIN Status s ON f.Status = s.Id JOIN Airline a ' \
+    'ON f.AirlineId = a.Id WHERE AirlineId = {0};'.format(airlineID))
+
+    
 
     theData = cursor.fetchall()
     the_response = make_response(jsonify(theData))
@@ -55,11 +64,9 @@ def get_on_time_rate(airlineID):
 def get_avg_occupancy(airlineID):
     current_app.logger.info('GET /flights/<airlineID>/occupancyRate route')
     cursor = db.get_db().cursor()
-    cursor.execute('SELECT f.DepartureDate, '
-                        '(COUNT(b.PassengerId) / f.Occupancy * 100) AS OccupancyPercentage ' \
-                        'FROM Flight f LEFT JOIN Booked b ON f.FlightNumber = b.FlightNumber ' \
-                        'GROUP BY f.DepartureDate, f.Occupancy ' \
-                        'ORDER BY f.DepartureDate DESC;')
+    cursor.execute('SELECT f.DepartureDate, (COUNT(b.PassengerId) / f.Occupancy * 100) AS OccupancyPercentage ' \
+    'FROM Flight f LEFT JOIN Booked b ON f.FlightNumber = b.FlightNumber WHERE f.AirlineId = %s GROUP BY ' \
+    'f.DepartureDate, f.Occupancy ORDER BY f.DepartureDate DESC;', (airlineID))
     
     theData = cursor.fetchall()
     the_response = make_response(jsonify(theData))
@@ -68,8 +75,7 @@ def get_avg_occupancy(airlineID):
 
 
 #------------------------------------------------------------
-# Returns common reasons for flight delays [Bob-4]
-# IndexError: Replacement index 1 out of range for positional args tuple
+# Returns common reasons for flight delays
 
 @flight_stats.route('/flights/<airlineID>', methods=['GET'])
 def reasons_flight_delays(airlineID):
@@ -83,7 +89,7 @@ def reasons_flight_delays(airlineID):
                         'SUM(s.DelayedOperational) AS DelayedOperational ' \
                         'FROM Flight f ' \
                         'JOIN Status s ON f.Status = s.Id ' \
-                        'WHERE  f.AirlineId = 1;') 
+                        'WHERE  f.AirlineId = %s;', (airlineID)) 
     
     theData = cursor.fetchall()
     the_response = make_response(jsonify(theData))
@@ -92,7 +98,7 @@ def reasons_flight_delays(airlineID):
 
 
 #------------------------------------------------------------
-# Returns the most and least popular times for flights [Bob-5]
+# Returns the most and least popular times for flights
 # works
 
 @flight_stats.route('/flights', methods=['GET'])

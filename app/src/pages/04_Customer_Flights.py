@@ -36,7 +36,7 @@ if st.button("Submit"):
                     st.write(f"Flight Number: {flight_number}")
                     st.write(f"  - Departure Airport: {departure_airport_code}")
                     st.write(f"  - Arrival Airport: {arrival_airport_code}")
-                else:
-                     st.warning("No flights found for this passenger.")
+            else:
+                 st.warning("No flights found for this passenger.")
     except Exception as e:
         st.error("Unable to find flights. Try Again")
