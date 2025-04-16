@@ -51,10 +51,16 @@ with st.form("add_form"):
           "airline_id": int(airline_id)
       }
 
-      response = requests.post("http://api:4000/flight_information/addFlight", json=data)
+      try:
 
-      if response.status_code == 200:
+        response = requests.post("http://api:4000/flight_information/addFlight", json=data)
+
+        if response.status_code == 200:
+            
+            st.success("Flight successfully added!")
+        else:
+          st.error("Could not add flight")
+
+      except Exception as e:
+          st.error("Error connecting. Try again later")
           
-          st.success("Flight successfully added!")
-      else:
-         st.error("Could not add flight")
