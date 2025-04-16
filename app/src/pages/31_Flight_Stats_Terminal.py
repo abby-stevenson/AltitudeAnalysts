@@ -52,5 +52,5 @@ if st.button("Get Flights"):
         else:
             st.write(f"No flight and/or terminal found")
     except Exception as e:
-        st.warning(f"An unexpected error occurred: {e}")
+        st.error("Couldn't connect. Try again later")
 
