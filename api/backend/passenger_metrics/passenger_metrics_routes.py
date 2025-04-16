@@ -71,18 +71,16 @@ def passenger_flights(passenger_id):
     return response
 
 #------------------------------------------------------------
-# Gets the status of all the given passenger’s flights 
-@passenger_metrics.route('/flight_statuses/<passenger_id>', methods=['GET'])
-def passenger_flights_status(passenger_id):
+# Gets the status of a given flight
+@passenger_metrics.route('/flight_statuses/<flight_number>', methods=['GET'])
+def passenger_flights_status(flight_number):
     cursor = db.get_db().cursor()
     cursor.execute("""SELECT f.FlightNumber, s.Cancelled, s.OnTime, s.DelayedCascading, 
                    s.DelayedTechnicalIssues, s.DelayedAdminIssues,
                     s.DelayedOther, s.DelayedWeather, s.DelayedOperational
                         FROM Status s
                             JOIN Flight f ON f.Status = s.Id
-                            JOIN Booked b ON b.FlightNumber = f.FlightNumber
-                            JOIN Passenger p ON p.Id = b.PassengerId
-                        WHERE p.Id = {0}""".format(passenger_id))
+                        WHERE f.FlightNumber = %s""", (flight_number))
     
     data = cursor.fetchall()
     
