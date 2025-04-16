@@ -184,3 +184,26 @@ def all_airlines():
     response = make_response(jsonify(data))
     response.status_code = 200
     return response
+
+
+
+#-----------------------------------------------------------
+# Returns all the airlines in the system
+@airports.route('/airport/<FlightNumber>/exists', methods=['GET'])
+def get_flightinfo(FlightNumber): 
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        SELECT FlightNumber
+        FROM Flight
+        WHERE FlightNumber = {0}; 
+    '''.format(FlightNumber))
+
+    theData = cursor.fetchall()
+    
+    the_response = make_response(jsonify(theData))
+    the_response.status_code = 200
+    return the_response
+
+
+
+
