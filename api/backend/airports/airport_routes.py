@@ -118,72 +118,20 @@ def update_gate_number(flight_id, gate_id):
     cursor = db.get_db().cursor()
 
     cursor.execute('''UPDATE Flight
-                    SET Gate = %s
-                    WHERE FlightNumber = %s
-                    AND Status IN (
-                        SELECT Id FROM Status WHERE OnTime != 1)
-    ''', (gate_id, flight_id))
+                        SET Gate = %s
+                        WHERE FlightNumber = %s ''', (gate_id, flight_id))
 
     db.get_db().commit()
     return 'gate updated'
 
 #-----------------------------------------------------------
-# add a business to the airport system
-@airports.route('/airport/<airport_code>/add-business', methods=['POST'])
-def add_business(airport_code):
-    current_app.logger.info('POST /airport/<airport_code>/add-business route')
-
-    data = request.get_json()
+# delete closed businesses from the airport system
+@airports.route('/airport/delete-closed-businesses', methods=['DELETE'])
+def delete_business():
+    current_app.logger.info('DELETE /airport/<businesses> route')
+    cursor = db.get_db().cursor()
+    cursor.execute('DELETE FROM Business WHERE OpenOrClose = 0')
     
-    business_id = data.get('Id')
-    name = data.get('Name')
-    business_type = data.get('Type')
-
-    cursor = db.get_db().cursor()
-    cursor.execute(''' INSERT INTO Business(Id, Name, Type, AirportCode, OpenOrClose)
-                   VALUES (%s, %s, %s, %s, 1)
-    ''', (business_id, name, business_type, airport_code))
-
     db.get_db().commit()
-    return 'business successfully added'
     
-#-----------------------------------------------------------
-# delete a specified business from the airport system
-@airports.route('/airport/<business_id>/delete-business', methods=['DELETE'])
-def delete_business(business_id):
-    current_app.logger.info('DELETE /airport/<business_id>/delete-business route')
-    cursor = db.get_db().cursor()
-
-    cursor.execute(''' DELETE FROM Business
-                   WHERE Id = %s''', (business_id))
-
-    db.get_db().commit()
-    return 'business successfully removed'
-
-#-----------------------------------------------------------
-# Returns all the aiprorts in the system
-@airports.route('/all_airports', methods=['GET'])
-def all_airports():
-    current_app.logger.info('GET /airports route')
-    cursor = db.get_db().cursor()
-    cursor.execute('''SELECT Code
-                        FROM Airport''')
-    data = cursor.fetchall()
-
-    response = make_response(jsonify(data))
-    response.status_code = 200
-    return response
-
-#-----------------------------------------------------------
-# Returns all the airlines in the system
-@airports.route('/all_airlines', methods=['GET'])
-def all_airlines():
-    current_app.logger.info('GET /all_airlines route')
-    cursor = db.get_db().cursor()
-    cursor.execute('''SELECT Name
-                        FROM Airline''')
-    data = cursor.fetchall()
-
-    response = make_response(jsonify(data))
-    response.status_code = 200
-    return response
+    return  'all closed businesses deleted!'

@@ -47,6 +47,7 @@ def create_app():
     app.register_blueprint(flight_searching, url_prefix='/f')
     app.register_blueprint(passenger_metrics, url_prefix='/pm')
 
+
     # Don't forget to return the app object
     return app
 

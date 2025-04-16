@@ -13,8 +13,7 @@ import datetime
 flight_searching = Blueprint('flight_searching', __name__)
 
 #------------------------------------------------------------
-# Returns all flights between these two dates [Stacy-1] -- COMPLETE WITHOUT DATES 
-
+# Returns all flights between these two dates [Stacy-1] 
 @flight_searching.route('/flight_searching/<Date1>/<Date2>', methods=['GET'])
 
 def get_flightdates(Date1 ,Date2):

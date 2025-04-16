@@ -7,33 +7,36 @@ import requests
 
 st.set_page_config(layout = 'wide')
 
-# Display the appropriate sidebar links for the role of the logged in user
 SideBarLinks()
 
-# Person 1, User Story 2
-# As a travel agent, I want to view a list of flights that my customers 
-# have booked onto so that I can manage their itineraries effectively.
 
 st.title('Flights Customers Have Booked')
+passenger_id = st.text_input("Enter Customer's Passenger ID:")
 
-passenger_id_input = st.text_input("Enter the Passenger ID of the customer you want to check:")
-if st.button("Get Booked Flights"):
-    if not passenger_id_input.isdigit():
-       st.warning("Please enter a valid numeric Passenger ID.")
+if st.button("Submit"):
+    if not passenger_id.isdigit():
+        st.warning("Please enter a valid numeric Passenger ID.")
     else:
-       passenger_id = int(passenger_id_input)
+        passenger_id = int(passenger_id)
     try:
-       response = requests.get(f"http://api:4000/pm/flight_information/{passenger_id}")
+        response = requests.get(f"http://api:4000/pm/flight_information/{passenger_id}")
 
+        if response.status_code == 200:
+            data = response.json()
+            if data:
+                st.subheader(f"Customer #{passenger_id} has the following flights booked:")
 
-       if response.status_code == 200:
-          data = response.json()
-          if data:
-             flight_nums = [data['FlightNumber'] for item in data]
-             st.header(f"Passenger #{passenger_id} has the following flights booked:")
-             for num in flight_nums:
-                st.write(f"Flight Number: {num}")
+                for item in data:
+                    
+                    flight_number = item.get('FlightNumber')
+                    arrival_airport_code = item.get('ArrivalAirportCode')
+                    departure_airport_code = item.get('DepartureAirportCode')
 
-                try:
-                   
-             
+                    
+                    st.write(f"Flight Number: {flight_number}")
+                    st.write(f"  - Departure Airport: {departure_airport_code}")
+                    st.write(f"  - Arrival Airport: {arrival_airport_code}")
+                else:
+                     st.warning("No flights found for this passenger.")
+    except Exception as e:
+        st.error("Unable to find flights. Try Again")

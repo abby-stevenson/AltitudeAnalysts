@@ -1,66 +1,56 @@
 import logging
 logger = logging.getLogger(__name__)
 import streamlit as st
-from streamlit_extras.app_logo import add_logo
-import numpy as np
-import random
-import time
+import requests
 from modules.nav import SideBarLinks
+import datetime
 
 SideBarLinks()
 
-def response_generator():
-  response = random.choice (
-    [
-      "Hello there! How can I assist you today?",
-      "Hi, human!  Is there anything I can help you with?",
-      "Do you need help?",
-    ]
-  )
-  for word in response.split():
-    yield word + " "
-    time.sleep(0.05)
-#-----------------------------------------------------------------------
+st.write("# Add a passenger")
 
-st.set_page_config (page_title="Sample Chat Bot", page_icon="🤖")
-add_logo("assets/logo.png", height=400)
+with st.form("add_change_form"):
+  st.write("Please enter all fields")
+  first_name = st.text_input("First Name")
+  last_name = st.text_input("Last Name")
+  birthday = st.date_input("Date of Birth", datetime.date.today(), "1900-01-01", "today")
+  email = st.text_input("Email Address")
+  passenger_id = st.text_input("Passenger ID")
+  agent_id = st.text_input("Please enter your travel agent ID")
 
-st.title("Echo Bot 🤖")
+  submitted = st.form_submit_button("Submit")
 
-st.markdown("""
-            Currently, this chat bot only returns a random message from the following list:
-            - Hello there! How can I assist you today?
-            - Hi, human!  Is there anything I can help you with?
-            - Do you need help?
-            """
-           )
+  if submitted:
+    all_checks = True
+    
+    if not "@" in email or not "." in email:
+        st.warning('Please enter a valid email')
+        all_checks = False
+    if any(char.isdigit() for char in first_name) or any(char.isdigit() for char in last_name):
+       st.warning('Please enter non-numeric characters in names')
+       all_checks = False
+    if not passenger_id.isdigit():
+       st.warning("Please enter a valid numeric passenger ID")
+       all_checks = False
+    if not agent_id.isdigit():
+       st.warning("Please enter a valid numeric agent ID")
+       all_checks = False
 
+    if all_checks:
+        data = {
+            "FirstName": first_name,
+            "LastName": last_name,
+            "DOB": birthday.strftime("%Y-%m-%d"),
+            "Email": email,
+            "Id": int(passenger_id)
+        }
 
-# Initialize chat history
-if "messages" not in st.session_state:
-  st.session_state.messages = []
+        agentID = int(agent_id)
 
-# Display chat message from history on app rerun
-for message in st.session_state.messages:
-  with st.chat_message(message["role"]):
-    st.markdown(message["content"])
+        response = requests.post(f"http://api:4000/pm/add_passenger/{agentID}/passenger", json=data)
 
-# React to user input
-if prompt := st.chat_input("What is up?"):
-  # Display user message in chat message container
-  with st.chat_message("user"):
-    st.markdown(prompt)
-  
-  # Add user message to chat history
-  st.session_state.messages.append({"role": "user", "content": prompt})
-
-  response = f"Echo: {prompt}"
-
-  # Display assistant response in chat message container
-  with st.chat_message("assistant"):
-    # st.markdown(response)
-    response = st.write_stream(response_generator())
-
-  # Add assistant response to chat history
-  st.session_state.messages.append({"role": "assistant", "content": response})
-
+        if response.status_code == 200:
+                
+            st.success("Passenger successfully added!")
+        else:
+            st.error("Could not add passenger, check if Agent ID is valid or Passenger ID is already taken")
