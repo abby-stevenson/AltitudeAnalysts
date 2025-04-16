@@ -209,15 +209,15 @@ def delete_booking(flightID, passengerID):
     return 'Booking Deleted!'
 
 
-
+#-------------------------------------------------------------------------
 # Returns passenger if it is the system
 @passenger_metrics.route('/checkpassenger/<PassengerId>/exists', methods=['GET'])
-def get_flightinfo(PassengerId): 
+def get_passengerTest(PassengerId): 
     cursor = db.get_db().cursor()
     cursor.execute('''
-        SELECT PassengerId
+        SELECT Id
         FROM Passenger
-        WHERE PassengerId = {0}; 
+        WHERE Id = {0}; 
     '''.format(PassengerId))
 
     theData = cursor.fetchall()
@@ -225,4 +225,40 @@ def get_flightinfo(PassengerId):
     the_response = make_response(jsonify(theData))
     the_response.status_code = 200
     return the_response
+
+
+#-------------------------------------------------------------------------
+# Returns booking if it is the system
+@passenger_metrics.route('/checkpassenger/<FlightNumber>/<PassengerId>/exists', methods=['GET'])
+def get_bookingTest(FlightNumber, PassengerId): 
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        SELECT FlightNumber, PassengerId
+        FROM Booked
+        WHERE FlightNumber = {0} AND PassengerId = {0}; 
+    '''.format(FlightNumber, PassengerId))
+
+    theData = cursor.fetchall()
+    
+    the_response = make_response(jsonify(theData))
+    the_response.status_code = 200
+    return the_response
+
+#-------------------------------------------------------------------------
+# Given a seat ID checks its class
+@passenger_metrics.route('/checkseat/<FlightNumber>/<SeatNumber>', methods=['GET'])
+def get_seatTest(FlightNumber, SeatNumber): 
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        SELECT SeatNumber, FlightNumber, Class
+        FROM Seat
+        WHERE SeatNumber = %s AND FlightNumber = %s    
+        ''', (SeatNumber, FlightNumber))
+
+    theData = cursor.fetchall()
+    
+    the_response = make_response(jsonify(theData))
+    the_response.status_code = 200
+    return the_response
+
 
