@@ -66,7 +66,7 @@ def FlightStatus():
     st.sidebar.page_link("pages/21_Flight_Status.py", label="See the Status of Your Flight")
     
 def BoardingPass():
-    st.sidebar.page_link("pages/22_Boarding_Pass.py", label="Download and Print your Boarding Pass")
+    st.sidebar.page_link("pages/22_Boarding_Pass.py", label="Access Boarding Pass and Change Class")
 
 def BookedFlights():
     st.sidebar.page_link("pages/23_Booked_Flights.py", label="See All Your Booked Flights")
