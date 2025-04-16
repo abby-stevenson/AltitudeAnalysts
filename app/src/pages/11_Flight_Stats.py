@@ -73,10 +73,12 @@ if st.button("Submit"):
                 st.write("### Most Common Reasons for Flight Delays for Your Airline")
                 table_data = [(k, int(v)) for k, v in delay_data[0].items()]
                 df = pd.DataFrame(table_data, columns=["Reason", "Count"])
-                st.table(df)
+                df.sort_values(by="Count", ascending=False, inplace=True)
+                st.dataframe(df.reset_index(drop=True), hide_index=True)
             else:
                 st.warning("No delay data returned.")
         else:
             st.warning("No delay data found for this airline.")
     except Exception as e:
-        st.error("Unable to connnect")
+        st.error("Unable to connect")
+
