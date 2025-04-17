@@ -72,7 +72,7 @@ if st.session_state['successful_execution'] == True:
     submitted = st.form_submit_button("Submit")
     if submitted:
       check = True
-      if class_name != "Economy" or class_name != "Premium Economy" or class_name != "Business" or class_name != "First":
+      if not (class_name == "Economy" or class_name == "Premium Economy" or class_name == "Business" or class_name == "First"):
         st.warning("Please enter a valid class name")
         check = False
       
