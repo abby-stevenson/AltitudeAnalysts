@@ -59,18 +59,19 @@ with col2:
                 response = requests.get(f"http://api:4000/flight_information/all_info/{flight_number}")
                 
                 if response.status_code == 200:
-                    data = response.json()
-                    if data:
-                        st.success("Flight found:")
-                        departure_datetime = data.get("DepartureDateTime", "")
-                        formatted_datetime = (
-                            datetime.datetime.fromisoformat(departure_datetime).strftime("%Y-%m-%d %H:%M")
-                        )
+                    data_list = response.json()
+                    if data_list:
+                        for data in data_list:
+                            st.success("Flight found:")
+                            departure_datetime = data.get("DepartureDateTime", "")
+                            formatted_datetime = (
+                                datetime.datetime.fromisoformat(departure_datetime).strftime("%Y-%m-%d %H:%M")
+                            )
 
-                        st.header(f"Flight from {data.get('DepartureAirportCode', 'N/A')} to {data.get('ArrivalAirportCode', 'N/A')}")
-                        st.write(f"**Airline:** {data.get('Name', 'N/A')}")
-                        st.write(f"**Departure Date & Time:** {formatted_datetime}")
-                        st.write(f"**Price:** ${data.get('Price', 'N/A')}")
+                            st.header(f"Flight from {data.get('DepartureAirportCode', 'N/A')} to {data.get('ArrivalAirportCode', 'N/A')}")
+                            st.write(f"**Airline:** {data.get('Name', 'N/A')}")
+                            st.write(f"**Departure Date & Time:** {formatted_datetime}")
+                            st.write(f"**Price:** ${data.get('Price', 'N/A')}")
                     else:
                         st.warning("No flight found with that number.")
                 else:
@@ -109,15 +110,16 @@ with col2:
                     if allinfo:
                         st.success("Matching Flights:")
                         for flight_data in allinfo:
-                            departure_datetime = flight_data.get("DepartureDateTime")
-                            formatted_datetime = (
-                                datetime.datetime.fromisoformat(departure_datetime).strftime("%Y-%m-%d %H:%M")
-                            )
+                            for flight in flight_data:
+                                departure_datetime = flight.get("DepartureDateTime")
+                                formatted_datetime = (
+                                    datetime.datetime.fromisoformat(departure_datetime).strftime("%Y-%m-%d %H:%M")
+                                )
 
-                            st.header(f"Flight from {flight_data.get('DepartureAirportCode')} to {flight_data.get('ArrivalAirportCode')}")
-                            st.write(f"**Airline:** {flight_data.get('Name')}")
+                            st.header(f"Flight from {flight.get('DepartureAirportCode')} to {flight.get('ArrivalAirportCode')}")
+                            st.write(f"**Airline:** {flight.get('Name')}")
                             st.write(f"**Departure Date & Time:** {formatted_datetime}")
-                            st.write(f"**Price:** ${flight_data.get('Price')}")
+                            st.write(f"**Price:** ${flight.get('Price')}")
                     else:
                         st.warning("No detailed info found for flights.")
                 else:
