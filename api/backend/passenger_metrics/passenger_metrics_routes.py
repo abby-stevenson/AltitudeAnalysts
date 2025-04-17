@@ -215,9 +215,11 @@ def delete_booking(flightID, passengerID):
 def get_passengerTest(PassengerId): 
     cursor = db.get_db().cursor()
     cursor.execute('''
-        SELECT Id
-        FROM Passenger
-        WHERE Id = {0}; 
+        SELECT p.Id AS PassengerId, ta.Id AS TravelAgentId
+        FROM Passenger p
+        JOIN PassengerTravelAgent pta ON pta.PassengerId = p.Id
+        JOIN TravelAgent ta ON ta.Id = pta.TravelAgentId
+        WHERE p.Id = {0}; 
     '''.format(PassengerId))
 
     theData = cursor.fetchall()
